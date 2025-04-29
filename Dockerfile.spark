@@ -1,0 +1,25 @@
+FROM bitnami/spark:latest
+
+COPY requirements.txt /opt/bitnami/spark/
+COPY spark-streaming.py /opt/bitnami/spark/
+
+
+# Baixe os JARs necessários para o conector Kafka
+ADD https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.5.5/spark-sql-kafka-0-10_2.12-3.5.5.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.5.1/kafka-clients-3.5.1.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.11.1/commons-pool2-2.11.1.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar /opt/bitnami/spark/jars/
+ADD https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.5.5/spark-token-provider-kafka-0-10_2.12-3.5.5.jar /opt/bitnami/spark/jars/
+
+
+# Altere o usuário para root, instale o pip e os pacotes necessários
+USER root
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y python3-pip && \
+    pip3 install --no-cache-dir -r ./requirements.txt
+
+# Defina o diretório de trabalho para o Spark
+WORKDIR /opt/bitnami/spark/
+CMD ["spark-submit", "--jars", "/opt/bitnami/spark/jars/spark-sql-kafka-0-10_2.12-3.5.5.jar,/opt/bitnami/spark/jars/spark-token-provider-kafka-0-10_2.12-3.5.5.jar,/opt/bitnami/spark/jars/kafka-clients-3.5.1.jar,/opt/bitnami/spark/jars/commons-pool2-2.11.1.jar", "spark-streaming.py"]

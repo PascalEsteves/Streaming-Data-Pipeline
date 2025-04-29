@@ -61,3 +61,15 @@ services:
       SPARK_WORKER_CORES: 2
       SPARK_WORKER_MEMORY: 1g
       SPARK_MASTER_URL: spark://spark-master:7077
+
+  spark-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    volumes:
+      - ./spark-streaming.py:/opt/bitnami/spark/spark-streaming.py
+    depends_on:
+      - broker
+      - spark-master
+    environment:
+      SPARK_MASTER_URL: spark://spark-master:7077

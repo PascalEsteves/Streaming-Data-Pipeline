@@ -5,8 +5,9 @@ class AuthoMethodClass(type):
 
     def __new__(cls, name, bases, dct):
 
-        def get_race_info(self, data:dict)->dict:
-            return data["MRData"]["RaceTable"]["Races"][0]["Laps"][0]["Timings"][0]
+        def get_race_info(self, data:dict, extra_params:dict)->dict:
+            data = data["MRData"]["RaceTable"]["Races"][0]["Laps"][0]["Timings"][0]
+            return {**data, **extra_params}
         
         def check_race_name(self, data:dict, name:str)->bool:
             if data["MRData"]["RaceTable"]["Races"][0]["Circuit"]["circuitId"].lower() == name.lower():
