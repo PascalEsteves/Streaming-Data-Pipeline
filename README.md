@@ -10,3 +10,18 @@ Apache Kafka: Handles real-time data streaming.
 Apache Spark (Structured Streaming): Processes and transform streamed data in real time
 Streamlit: Provides an interactive dashboard for data visualization.
 
+API (historical data & simulation)
+        ↓
+Kafka (real-time data stream)
+        ↓
+Spark (stream processing & historical comparison)
+        ↓
+Streamlit (interactive dashboard)
+
+
+🔮 Future Improvements
+Support for multiple drivers simultaneously.
+
+Sector-based analysis and weather data integration.
+
+Integration with public F1 APIs (e.g., Ergast).
