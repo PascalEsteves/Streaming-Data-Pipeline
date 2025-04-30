@@ -36,7 +36,7 @@ def main():
     # Schemas
     historical_schema = StructType([
         StructField("driverId", StringType()),
-        StructField("position", IntegerType()),
+        StructField("position", StringType()),
         StructField("time", StringType()),
         StructField("year", IntegerType()),
         StructField("lap", IntegerType()),
@@ -47,6 +47,7 @@ def main():
     # Streams
     historical_data = (
         start_streaming(spark=spark, topic="historical_f1_topic", schema=historical_schema)
+        .withColumn("position", col("position").cast("int"))
         .withColumn("timestamp", col("timestamp").cast("timestamp"))
         .withColumn("minutes", F.regexp_extract("time", r"(\d+):", 1).cast("int"))
         .withColumn("seconds", F.regexp_extract("time", r":(\d+\.\d+)", 1).cast("double"))
@@ -56,7 +57,7 @@ def main():
     statistics_per_lap = (
         historical_data
         .withWatermark("timestamp", "1 minute")
-        .groupby("lap","driverId","year")
+        .groupby("lap","driverId","year","position")
         .agg(min("time_converted").alias("Time_Lap"))
     )
     statistics_per_lap.printSchema()

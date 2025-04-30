@@ -6,6 +6,7 @@ import uuid
 import random
 from models.models import F1Model
 from models.database import Database
+import time
 
 class F1_Track_range:
 
@@ -75,13 +76,16 @@ def run():
                 break
 
             extra_data = {
+                "event_id": f"{year}_{circuit_id}_{driver}_{lap}",
                 "year": year,
                 "lap": lap,
                 "track": circuit
             }
             data = f1_api.get_race_info(data=response, extra_params=extra_data)
-            print(data)
-            db.add_data_to_db(model=F1Model, data=F1Model(**data).__dict__)
+            try:
+                db.add_data_to_db(model=F1Model, data=F1Model(**data).__dict__)
+            except:
+                print("--- Historical Data Already in Database ------")
             producer.produce(
                 historical_f1_topic,
                 key=f"{str(year)}-{str(uuid.uuid4())}",
@@ -93,6 +97,7 @@ def run():
             break
 
         real_data = {
+            "event_id": f"{current_year}_{circuit_id}_{driver}_{lap}",
             "driverId": driver.lower(),
             "position": str(random.choice(positions)),
             "time": convert_seconds_to_time(random.choice(time_delta)),
@@ -100,8 +105,7 @@ def run():
             "lap": lap,
             "track": circuit
         }
-        print(real_data)
-        db.add_data_to_db(model=F1Model, data=F1Model(**real_data).__dict__)
+        #db.add_data_to_db(model=F1Model, data=F1Model(**real_data).__dict__)
         producer.produce(
             historical_f1_topic,
             key=f"{str(current_year)}-{str(uuid.uuid4())}",
@@ -112,6 +116,8 @@ def run():
         # Garante que todos os dados foram enviados antes de passar para a próxima volta
         producer.flush()
         lap += 1
+        
+        time.sleep(5)
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ class F1Model(EntityDboBase):
     __tablename__ = "driver_results_table"
     
     id = Column(Integer, primary_key=True)
+    Event_id = Column(String, unique=True)
     Driver_id = Column(String)
     Track = Column(String)
     Time = Column(String)
@@ -18,6 +19,7 @@ class F1Model(EntityDboBase):
     Year = Column(Integer)
 
     def __init__(self, **kwargs)->None:
+        self.Event_id = kwargs.get("event_id")
         self.Driver_id = kwargs.get("driverId")
         self.Track  = kwargs.get("track")
         self.Time = kwargs.get("time")
