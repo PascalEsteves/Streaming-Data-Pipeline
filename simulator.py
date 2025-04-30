@@ -105,7 +105,7 @@ def run():
             "lap": lap,
             "track": circuit
         }
-        #db.add_data_to_db(model=F1Model, data=F1Model(**real_data).__dict__)
+
         producer.produce(
             historical_f1_topic,
             key=f"{str(current_year)}-{str(uuid.uuid4())}",
@@ -113,12 +113,10 @@ def run():
             on_delivery=delivery_report
         )
 
-        # Garante que todos os dados foram enviados antes de passar para a próxima volta
         producer.flush()
         lap += 1
         
         time.sleep(5)
-
 
 if __name__ == "__main__":
     run()

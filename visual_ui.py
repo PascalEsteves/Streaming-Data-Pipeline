@@ -7,9 +7,7 @@ import streamlit as st
 from kafka import KafkaConsumer
 from streamlit_autorefresh import st_autorefresh
 
-# Function to create a Kafka consumer
 def create_kafka_consumer(topic_name):
-    # Set up a Kafka consumer with specified topic and configurations
     consumer = KafkaConsumer(
         topic_name,
         bootstrap_servers='localhost:9092',
@@ -17,51 +15,45 @@ def create_kafka_consumer(topic_name):
         value_deserializer=lambda x: json.loads(x.decode('utf-8')))
     return consumer
 
-# Function to fetch data from Kafka
+
 def fetch_data_from_kafka(consumer):
-    # Poll Kafka consumer for messages within a timeout period
+
     messages = consumer.poll(timeout_ms=1000)
     data = []
-
-    # Extract data from received messages
     for message in messages.values():
         for sub_message in message:
             data.append(sub_message.value)
     return data
 
-# Function to plot a bar chart for lap times
+
 def plot_bar_chart(data):
     plt.figure(figsize=(12, 6))
 
-    # Valores únicos de anos e voltas
     years = sorted(data['year'].unique())
     laps = sorted(data['lap'].unique())
-    bar_width = 0.8 / len(years)  # dividir espaço para não sobrepor
-    x = np.arange(len(laps))  # posições base para cada lap
+    bar_width = 0.8 / len(years) 
+    x = np.arange(len(laps))  
 
     for i, year in enumerate(years):
         group = data[data['year'] == year]
-        # Alinhar as barras com deslocamento horizontal
         offsets = x + i * bar_width
-        # Alinhar os dados por lap
         positions = [group[group['lap'] == lap]['position'].values[0] if lap in group['lap'].values else np.nan for lap in laps]
         plt.bar(offsets, positions, width=bar_width, label=str(year))
 
     plt.xlabel('Lap')
     plt.ylabel('Position')
     plt.title('Position per Lap per Year')
-    plt.xticks(x + bar_width * (len(years) - 1) / 2, laps)  # centralizar os ticks
+    plt.xticks(x + bar_width * (len(years) - 1) / 2, laps)  
     plt.legend(title='Year')
     plt.tight_layout()
-    #plt.gca().invert_yaxis()  # Se menor posição for melhor (como em corridas)
+    #plt.gca().invert_yaxis() 
     return plt
 
-# Function to plot a line chart for lap times
 def plot_line_chart(data):
     plt.figure(figsize=(10, 6))
     
     for year, group in data.groupby(["year"]):
-        group = group.sort_values(by=['lap'])  # Ordena as voltas sequencialmente por ano e número da volta
+        group = group.sort_values(by=['lap']) 
         
         plt.plot(group['lap'], group['Time_Lap'], marker='o', label=f'{year}')
     
@@ -76,13 +68,11 @@ def update_data(data):
 
     data_frame = pd.DataFrame(data)
 
-    # Metrics Section
     st.markdown("---")
     st.metric("Total Messages Received", len(data_frame))
     latest_year = data_frame['year'].max()
     st.metric("Latest Year Processed", latest_year)
 
-    # Visualizations
     st.markdown("---")
     st.header("Lap Times Overview")
 
@@ -92,7 +82,6 @@ def update_data(data):
     line_chart = plot_line_chart(data_frame)
     st.pyplot(line_chart)
 
-# Sidebar layout for auto-refresh
 def sidebar():
 
     data = []
@@ -109,13 +98,10 @@ def sidebar():
     print(data)
     update_data(data)
     
-
-    # Button to manually refresh data
     if st.sidebar.button('Refresh Data'):
         data = fetch_data_from_kafka(consumer)
         update_data(data)
 
-# Main function to fetch and visualize data
 def main():
     st.title('🏎️ F1 Real-Time Driver Statistics Dashboard')
     sidebar()

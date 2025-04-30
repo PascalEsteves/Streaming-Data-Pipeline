@@ -63,11 +63,8 @@ def main():
     statistics_per_lap.printSchema()
 
     try:
-        query1 = write_to_kafka(historical_data, "f1_comparison_topic", "/tmp/kafka-checkpoint/comparison")
-        query2 = write_to_kafka(statistics_per_lap, "f1_driver_stats_topic", "/tmp/kafka-checkpoint/stats", output_mode="update")
-
+        query1 = write_to_kafka(statistics_per_lap, "f1_driver_stats_topic", "/tmp/kafka-checkpoint/stats", output_mode="update")
         query1.awaitTermination()
-        query2.awaitTermination()
 
     except Exception as e:
         print(f"Erro durante o streaming: {e}")
