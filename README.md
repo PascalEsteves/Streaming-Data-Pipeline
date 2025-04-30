@@ -18,3 +18,18 @@ To enable real-time analysis of a driver's performance during a simulated race a
 - Support for multiple drivers simultaneously  
 - Sector-based analysis and weather data integration  
 - Integration with public F1 APIs (e.g., Ergast)
+
+
+## Some key points:
+
+ - I used UV to manage all the required packages and environments
+ - Docker commands:
+    - docker-compose up --build
+    - Inside broker contaiener to create manually the topic:
+        - kafka-topics \
+        --create --topic historical_f1_topic \
+        --bootstrap-server broker:29092 \
+        --replication-factor 1 \
+        --partitions 1
+    - list all topics created 
+        kafka-topics --list --bootstrap-server broker:29092
