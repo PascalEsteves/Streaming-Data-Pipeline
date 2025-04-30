@@ -20,8 +20,7 @@ Streamlit (interactive dashboard)
 
 
 🔮 Future Improvements
+
 Support for multiple drivers simultaneously.
-
 Sector-based analysis and weather data integration.
-
 Integration with public F1 APIs (e.g., Ergast).
